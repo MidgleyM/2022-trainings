@@ -6,11 +6,14 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
+import frc.robot.commands.DriveAutoCommand;
+import frc.robot.commands.DriveAutoCommandGroup;
 import frc.robot.commands.DriveProportionalCommand;
 import frc.robot.commands.ExampleCommand;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.ExampleSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -20,18 +23,16 @@ import edu.wpi.first.wpilibj2.command.Command;
  */
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
-  DriveSubsystem driveSubsystem;
   private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
 
   private final ExampleCommand m_autoCommand = new ExampleCommand(m_exampleSubsystem);
-  
+  DriveSubsystem driveSubsystem;
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
-    XboxController driverXboxController = new XboxController(0);
     DriveSubsystem driveSubsystem = new DriveSubsystem();
+    XboxController driverXboxController = new XboxController(0);
     driveSubsystem.setDefaultCommand(new DriveProportionalCommand(driverXboxController, driveSubsystem));
   }
-
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
    *
@@ -39,6 +40,6 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     // An ExampleCommand will run in autonomous
-    return m_autoCommand;
+    return new DriveAutoCommandGroup(driveSubsystem);
   }
 }
