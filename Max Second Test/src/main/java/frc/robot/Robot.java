@@ -6,7 +6,6 @@ package frc.robot;
 
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
-import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
 import edu.wpi.first.wpilibj.TimedRobot;
@@ -21,8 +20,8 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
  */
 public class Robot extends LoggedRobot {
   private Command m_autonomousCommand;
+
   private RobotContainer m_robotContainer;
-  private Logger logger = Logger.getInstance();
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -30,16 +29,17 @@ public class Robot extends LoggedRobot {
    */
   @Override
   public void robotInit() {
-    Logger.getInstance().recordMetadata("ProjectName", "MyProject"); // Set a metadata value
+  Logger.getInstance().recordMetadata("ProjectName", "MyProject"); // Set a metadata value
 
 if (isReal()) {
-    logger.addDataReceiver(new WPILOGWriter("/media/lvuser/home/")); // Log to a USB stick
+    logger.addDataReceiver(new WPILOGWriter("/media/sda1/")); // Log to a USB stick
+    logger.addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables
+    new PowerDistribution(1, ModuleType.kRev); // Enables power distribution logging
 } else {
     setUseTiming(false); // Run as fast as possible
-    String logPath = "Documents"; // Pull the replay log from AdvantageScope (or prompt the user)
-
+    String logPath = LogFileUtil.findReplayLog(); // Pull the replay log from AdvantageScope (or prompt the user)
     logger.setReplaySource(new WPILOGReader(logPath)); // Read replay log
-    logger.addDataReceiver(new WPILOGWriter("C:\\Users\\mamil\\Documents")); // Save outputs to a new log
+    logger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim"))); // Save outputs to a new log
 }
 
 Logger.getInstance().start(); // Start logging! No more data receivers, replay sources, or metadata values may be added.
@@ -74,7 +74,6 @@ Logger.getInstance().start(); // Start logging! No more data receivers, replay s
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
   public void autonomousInit() {
-    // Get selected routine from the SmartDashboard
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
     // schedule the autonomous command (example)
@@ -89,9 +88,9 @@ Logger.getInstance().start(); // Start logging! No more data receivers, replay s
 
   @Override
   public void teleopInit() {
-    // This makes sure that the autonomous stops running which will
-    // use the default command which is ArcadeDrive. If you want the autonomous
-    // to continue until interrupted by another command, remove
+    // This makes sure that the autonomous stops running when
+    // teleop starts running. If you want the autonomous to
+    // continue until interrupted by another command, remove
     // this line or comment it out.
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();

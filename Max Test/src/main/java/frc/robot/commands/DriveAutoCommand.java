@@ -6,12 +6,13 @@ import frc.robot.subsystems.DriveSubsystem;
 public class DriveAutoCommand extends CommandBase{
     long totalTime;
     DriveSubsystem driveSubsystem;
-    double speed; double turn;int runTime;  
+    double speed; double turn;int runTime;
     public DriveAutoCommand(DriveSubsystem driveSubsystem, int runTime, double speed, double turn){
         this.driveSubsystem = driveSubsystem;
         this.speed = speed;
         this.turn = turn;
         this.runTime = runTime;
+        addRequirements(driveSubsystem);
     }
     @Override
     public void initialize(){
@@ -24,6 +25,7 @@ public class DriveAutoCommand extends CommandBase{
     }
     @Override
     public void end(boolean interrupted){
-        driveSubsystem.motorStop();
+        //driveSubsystem.motorStop();
+        System.out.println("ended");
     }
 }
